@@ -9,7 +9,25 @@ const readline = require('readline');
 // fetch the page, call writeToFile to save the contents
 const fetchPageContents = function(url, callback, fileName) {
   request(url, (error, response, body) => {
-    callback(body, fileName);
+
+    // check if file exists
+    if (fs.existsSync(fileName)) {
+      // readline setup
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+
+      rl.question('File exists, replace it?', (answer) => {
+        rl.close();
+        if (answer === 'Y') {
+          return callback(body, fileName);
+        }
+        return console.log('Operation cancelled');
+      });
+    } else {
+      callback(body, fileName);
+    }
   });
 };
 
@@ -18,14 +36,8 @@ const writeToFile = function(content, fileName) {
     if (err) {
       throw err;
     }
-
-    // check if file exists
-    if (fs.existsSync(fileName)) {
-      console.log('file exists, replaced it');
-    } else {
-      const fileSize = fs.statSync(fileName).size;
-      console.log(`Downloaded and saved ${fileSize} bytes to ${fileName}`);
-    }
+    const fileSize = fs.statSync(fileName).size;
+    console.log(`Downloaded and saved ${fileSize} bytes to ${fileName}`);
   });
 };
 
