@@ -9,6 +9,9 @@ const readline = require('readline');
 // fetch the page, call writeToFile to save the contents
 const fetchPageContents = function(url, callback, fileName) {
   request(url, (error, response, body) => {
+    if (response.statusCode !== 200) {
+      return console.log('Page not found. Operation cancelled');
+    }
 
     // check if file exists
     if (fs.existsSync(fileName)) {
